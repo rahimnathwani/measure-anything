@@ -27,3 +27,7 @@ def questionform():
         return redirect(url_for('estimation.questionform'))
     return render_template('question.html', form = form, question = question.text)
 
+'''
+Need to add something to:
+Get current user -> estimates -> questions -> answers
+'''

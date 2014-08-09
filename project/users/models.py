@@ -18,6 +18,7 @@ class User(db.Model, UserMixin):
     confirmed_at = db.Column(db.DateTime())
     roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
     connections = db.relationship('Connection', backref=db.backref('user', lazy='joined'), cascade="all")
+    estimates = db.relationship("Estimate", backref='user')
 
 class Connection(db.Model):
     id = db.Column(db.Integer, primary_key=True)
