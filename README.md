@@ -18,3 +18,21 @@ I want to create a free app to train calibration.  I'm imagining something which
 The closest thing I have found (thanks to gtardini on HN), is this [iPhone app](https://itunes.apple.com/it/app/updating-game/id524916372?mt=8)
 
 I'll use Python 2.7 and Flask.  I'll update this file with installation instructions when there's something to see.
+
+## Installation Instructions
+1. Clone the repo
+2. `pip install < requirements.txt`
+3. Create a file project/localsettings.py and put in your credentials for flask-social, e.g.:
+```
+SOCIAL_GOOGLE = {
+    'consumer_key': 'asfasdfsdfasdf',
+    'consumer_secret': 'sdfgdgdfg'
+}
+SOCIAL_FACEBOOK = {
+    'consumer_key': 'dsfgasfasdfsdfasdf',
+    'consumer_secret': 'dffgdffgsdfgdgdfg'
+}
+```
+4. Create an empty Postgres database called 'measure', with a username/password of 'measure'.
+5. Run `python manage.py db upgrade`
+6. Run `python manage.py runserver -d`

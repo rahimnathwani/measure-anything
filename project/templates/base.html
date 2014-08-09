@@ -1,6 +1,16 @@
 {% extends "bootstrap/base.html" %}
 
-{% block title %}Flasky{% endblock %}
+{% block title %}Measure Anything{% endblock %}
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
 
 {% block navbar %}
 <div class="navbar navbar-inverse" role="navigation">
@@ -19,8 +29,11 @@
 	<div class="navbar-collapse collapse">
 		<ul class="nav navbar-nav">
 			<li><a href="/">Intro</a></li>
-			<li><a href="/">Questions</a></li>
-			<li><a href="/">Results</a></li>
+			<li><a href="/question">Questions</a></li>
+			<li><a href="/login">Login</a></li>
+			<li><a href="/logout">Logout</a></li>
+			<li><a href="/register">Register</a></li>
+			<li><a href="/profile">My profile</a></li>
 
 		</ul>
 	</div>
