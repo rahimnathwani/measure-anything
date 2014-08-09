@@ -54,3 +54,6 @@ docs/_build/
 
 # OS X
 .DS_Store
+
+# Secret stuff
+localsettings.py
