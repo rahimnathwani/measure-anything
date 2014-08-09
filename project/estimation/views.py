@@ -1,4 +1,5 @@
 from flask import render_template, request
+from flask.ext.security import login_required
 from . import estimation
 from .models import Question
 from .forms import EstimateForm
@@ -12,6 +13,7 @@ def index():
 	return render_template('index.html')
 
 @estimation.route('/question', methods=["POST", "GET"])
+@login_required
 def questionform():
 	question = get_random_question()
 	form = EstimateForm(request.values, question_id=question.id)
