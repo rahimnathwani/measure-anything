@@ -2,8 +2,9 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 SECRET_KEY = 'any string which is not guessable'
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, '../data.sqlite')
+SQLALCHEMY_DATABASE_URI = 'postgresql://measure:measure@localhost/measure'
 SQLALCHEMY_COMMIT_ON_TEARDOWN = True
+SECURITY_POST_LOGIN = '/profile'
 
 try:
     from localsettings import *
