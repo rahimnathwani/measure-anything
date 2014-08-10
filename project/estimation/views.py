@@ -31,3 +31,12 @@ def questionform():
 Need to add something to:
 Get current user -> estimates -> questions -> answers
 '''
+@estimation.route('/results', methods=['GET'])
+@login_required
+def results():
+    estimates = current_user.estimates
+    answers = [(estimate.lowerbound, estimate.upperbound, Question.query.get(estimate.question_id).answer, Question.query.get(estimate.question_id).text) for estimate in estimates]
+    scores = [1 if answer[0] <= answer[2] <= answer[1] else 0 for answer in answers]
+    lifetime_accuracy = int(100 * sum(scores) / len(scores))
+    return render_template('results.html', lifetime_accuracy = lifetime_accuracy, answers = answers, scores = scores)
+
