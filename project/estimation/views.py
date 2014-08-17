@@ -2,6 +2,7 @@ from flask import render_template, request
 from . import estimation
 from .models import Question
 from .forms import EstimateForm
+from flask.ext.login import login_required, current_user
 import random
 
 def get_random_question():
@@ -12,6 +13,7 @@ def index():
 	return render_template('index.html')
 
 @estimation.route('/question', methods=["POST", "GET"])
+@login_required
 def questionform():
 	question = get_random_question()
 	form = EstimateForm(request.values, question_id=question.id)
