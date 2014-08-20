@@ -1,11 +1,12 @@
-from flask import render_template, redirect, request, url_for, flash
+from flask import render_template, redirect, request, url_for, flash, session, jsonify
 from flask.ext.login import login_user, logout_user, login_required, current_user
 from . import auth
-from .. import db
-from .models import User
+from .. import db, oauth
+from .models import User, Connection
 from ..email import send_email
 from .forms import LoginForm, RegistrationForm, ChangePasswordForm,\
     PasswordResetRequestForm, PasswordResetForm, ChangeEmailForm
+from flask_oauthlib.client import OAuth
 
 
 @auth.before_app_request
@@ -32,7 +33,7 @@ def login():
         if user is not None and user.verify_password(form.password.data):
             login_user(user, form.remember_me.data)
             return redirect(request.args.get('next') or url_for('estimation.index'))
-        flash('Invalid username or password.')
+        flash('Invalid email or password.')
     return render_template('auth/login.html', form=form)
 
 
@@ -49,7 +50,6 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(email=form.email.data,
-                    username=form.username.data,
                     password=form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -60,6 +60,51 @@ def register():
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', form=form)
 
+@auth.route('/login/<provider_id>', methods=['GET', 'POST'])
+def login_oauth(provider_id):
+    if provider_id == 'google':
+        return auth.google.authorize(callback=url_for('auth.authorized', provider_id='google', _external=True))
+    else:
+        return 'unknown provider_id'
+
+@auth.route('/login/authorized/<provider_id>')
+def authorized(provider_id):
+    if provider_id == 'google':
+        resp = auth.google.authorized_response()
+        if resp is None:
+            return 'Access denied: reason=%s error=%s' % (
+                request.args['error_reason'],
+                request.args['error_description']
+            )
+        session['google_token'] = (resp['access_token'], '')
+        me = auth.google.get('userinfo')
+        connection = Connection.query.filter_by(oauth_id=me.data.get('id','')).first()
+        if connection is not None:
+            user = User.query.filter_by(id=connection.user_id).first()
+            print "existing user"
+        else:
+            user = User(email=me.data['email'],
+                        password="xxxx",
+                        confirmed=me.data.get('verified_email',False))
+            db.session.add(user)
+            db.session.commit()
+            connection = Connection(user_id=user.id,
+                                    oauth_provider='google',
+                                    oauth_id=me.data.get('id',''),
+                                    oauth_token=resp['access_token'],
+                                    oauth_secret = None,
+                                    display_name = me.data.get('name',''),
+                                    full_name = me.data.get('name',''),
+                                    profile_url = me.data.get('link',''),
+                                    image_url = me.data.get('picture',''))
+            db.session.add(connection)
+            db.session.commit()
+            print "new user"
+        login_user(user)
+        print jsonify({"data": me.data})
+        return redirect(url_for('estimation.index'))
+    else:
+        return 'unknown provider_id'
 
 @auth.route('/confirm/<token>')
 @login_required

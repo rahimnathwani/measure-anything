@@ -42,7 +42,6 @@ class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(64), unique=True, index=True)
-    username = db.Column(db.String(64), unique=True, index=True)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     password_hash = db.Column(db.String(128))
     confirmed = db.Column(db.Boolean, default=False)
@@ -51,6 +50,8 @@ class User(UserMixin, db.Model):
     about_me = db.Column(db.Text())
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
+    connections = db.relationship('Connection',
+            backref=db.backref('user', lazy='joined'), cascade="all")
 
     @staticmethod
     def generate_fake(count=100):
@@ -61,7 +62,6 @@ class User(UserMixin, db.Model):
         seed()
         for i in range(count):
             u = User(email=forgery_py.internet.email_address(),
-                     username=forgery_py.internet.user_name(True),
                      password=forgery_py.lorem_ipsum.word(),
                      confirmed=True,
                      name=forgery_py.name.full_name(),
@@ -156,7 +156,6 @@ class User(UserMixin, db.Model):
 
     def to_json(self):
         json_user = {
-            'username': self.username,
             'member_since': self.member_since,
             'last_seen': self.last_seen,
         }
@@ -177,7 +176,7 @@ class User(UserMixin, db.Model):
         return User.query.get(data['id'])
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return '<User %r>' % self.email
 
 
 class AnonymousUser(AnonymousUserMixin):
@@ -186,6 +185,19 @@ class AnonymousUser(AnonymousUserMixin):
 
     def is_administrator(self):
         return False
+
+class Connection(db.Model):
+    __tablename__ = "connections"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    oauth_provider = db.Column(db.String(255))
+    oauth_id = db.Column(db.String(255))
+    oauth_token = db.Column(db.String(255))
+    oauth_secret = db.Column(db.String(255))
+    display_name = db.Column(db.String(255))
+    full_name = db.Column(db.String(255))
+    profile_url = db.Column(db.String(512))
+    image_url = db.Column(db.String(512))
 
 login_manager.anonymous_user = AnonymousUser
 

@@ -6,11 +6,13 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.migrate import Migrate, MigrateCommand
 from flask.ext.mail import Mail
 from flask.ext.login import LoginManager
+from flask_oauthlib.client import OAuth
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 bootstrap = Bootstrap()
 db = SQLAlchemy()
 mail = Mail()
+oauth = OAuth()
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
@@ -24,6 +26,7 @@ def create_app(config_name):
     db.init_app(app)
     mail.init_app(app)
     login_manager.init_app(app)
+    oauth.init_app(app)
 
     from .estimation import estimation as estimation_blueprint
     app.register_blueprint(estimation_blueprint)
