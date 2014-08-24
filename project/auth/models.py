@@ -52,6 +52,7 @@ class User(UserMixin, db.Model):
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     connections = db.relationship('Connection',
             backref=db.backref('user', lazy='joined'), cascade="all")
+    estimates = db.relationship("Estimate", backref='user')
 
     @staticmethod
     def generate_fake(count=100):
