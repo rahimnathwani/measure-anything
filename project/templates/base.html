@@ -19,7 +19,7 @@
 	<div class="navbar-collapse collapse">
 		<ul class="nav navbar-nav">
 			<li><a href="/">Intro</a></li>
-			<li><a href="/">Questions</a></li>
+			<li><a href="/question">Questions</a></li>
 			<li><a href="/">Results</a></li>
 
 		</ul>
@@ -27,7 +27,19 @@
 </div>
 </div>
 {% endblock %}
+
+
 {% block content %}
+<div class="container">
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning">
+<button type="button" class="close" data-dismiss="alert">&times;</button>
+{{ message }}
+</div>
+{% endfor %}
+{% block page_content %}{% endblock %}
+</div>
+
 <div class="container">
 	<div class="page-header">
 		<h1>Nothing to see here</h1>

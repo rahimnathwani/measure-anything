@@ -7,7 +7,7 @@ class Question(db.Model):
 
 class Estimate(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'))    
     lowerbound = db.Column(db.Numeric)
     upperbound = db.Column(db.Numeric)
